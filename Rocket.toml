@@ -1,0 +1,19 @@
+[debug]
+address = "0.0.0.0"
+port = 8000
+workers = 12
+keep_alive = 5
+log_level = "normal"
+secret_key = "N9jNdAKYpIH8cKTX3bz0p1MUuVLhotpmeS428FIEHPY="
+limits = { forms = 1000, json = "3906 MiB" }
+[release]
+address = "0.0.0.0"
+port = 8000
+workers = 12
+keep_alive = 5
+log_level = "critical"
+secret_key = "imQQf3n4lmtdmsDJh0NYZ2qJ9cAINkLds/fUQR9K5gU="
+limits = { forms = 1000, json = "3906 MiB" }
+# [default.tls]
+# certs = "cert.crt"
+# key = "key.key"
