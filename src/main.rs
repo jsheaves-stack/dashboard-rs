@@ -1,6 +1,3 @@
-use docker::Containers;
-use docker::Docker;
-use docker::DockerInterface;
 use rocket::fairing::Fairing;
 use rocket::fairing::Info;
 use rocket::fairing::Kind;
@@ -9,10 +6,20 @@ use rocket::http::Header;
 use rocket::http::Method;
 use rocket::http::Status;
 use rocket::launch;
+use rocket::response::Response;
 use rocket::routes;
-use rocket::serde::json::Json;
 use rocket::Request;
-use rocket::Response;
+
+use routes::docker::{
+    get_all_containers, get_container, get_container_logs, get_container_stats, get_container_top,
+    start_container, stop_container,
+};
+
+mod docker;
+mod http;
+mod routes;
+mod system;
+
 // use system::{ListProcesses, ProcessExplorer};
 pub struct CORS;
 
@@ -42,17 +49,6 @@ impl Fairing for CORS {
     }
 }
 
-#[get("/container/all")]
-fn get_all_containers() -> Result<Json<Containers>, String> {
-    match Docker::get_all_containers() {
-        Ok(containers) => Ok(Json(containers)),
-        Err(e) => {
-            println!("Error retrieving container list: {}", e);
-            Err(String::from("Internal server error"))
-        }
-    }
-}
-
 #[get("/healthcheck")]
 fn healthcheck() -> () {
     ();
@@ -61,7 +57,18 @@ fn healthcheck() -> () {
 #[launch]
 fn rocket() -> _ {
     rocket::build()
-        .mount("/docker", routes![get_all_containers])
+        .mount(
+            "/docker",
+            routes![
+                get_all_containers,
+                get_container,
+                stop_container,
+                start_container,
+                get_container_logs,
+                get_container_stats,
+                get_container_top
+            ],
+        )
         .mount("/", routes![healthcheck])
         .attach(CORS)
 }
